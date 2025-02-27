@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:teslacam/models/processing_job.dart';
 
 /// Home screen of the application
 class HomeScreen extends ConsumerWidget {
@@ -11,16 +10,11 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final processingJobs = <ProcessingJob>[];
-    final activeJobs = <ProcessingJob>[];
-    final completedJobs = <ProcessingJob>[];
     
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.large(
-            title: const Text('TeslaCam'),
-          ),
+          const _HomeAppBar(),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(20),
@@ -28,12 +22,12 @@ class HomeScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Video Merger',
+                    'Tesla Dashcam Video Merger',
                     style: theme.textTheme.titleLarge,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Merge multiple video views into a single video with customizable layouts.',
+                    'Merge multiple Tesla dashcam views into a single video with customizable layouts.',
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: Colors.grey.shade600,
                     ),
@@ -53,67 +47,6 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
           ),
-          if (activeJobs.isNotEmpty) ...[
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-              sliver: SliverToBoxAdapter(
-                child: Text(
-                  'Active Jobs',
-                  style: theme.textTheme.titleMedium,
-                ),
-              ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) => _buildJobCard(
-                    context,
-                    activeJobs[index],
-                    theme,
-                  ),
-                  childCount: activeJobs.length,
-                ),
-              ),
-            ),
-          ],
-          if (completedJobs.isNotEmpty) ...[
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
-              sliver: SliverToBoxAdapter(
-                child: Text(
-                  'Completed Jobs',
-                  style: theme.textTheme.titleMedium,
-                ),
-              ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) => _buildJobCard(
-                    context,
-                    completedJobs[index],
-                    theme,
-                  ),
-                  childCount: completedJobs.length,
-                ),
-              ),
-            ),
-          ],
-          if (processingJobs.isEmpty)
-            SliverFillRemaining(
-              hasScrollBody: false,
-              child: Center(
-                child: Text(
-                  'No processing jobs yet.\nStart a new project!',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: Colors.grey.shade500,
-                  ),
-                ),
-              ),
-            ),
         ],
       ),
     );
@@ -130,39 +63,119 @@ class HomeScreen extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          _buildFeatureItem(
-            theme,
-            Icons.videocam_rounded,
-            'Multiple Views',
-            'Support for up to 4 camera views',
-            true,
+          _FeatureItem(
+            icon: Icons.videocam_rounded,
+            title: 'Tesla Dashcam Support',
+            subtitle: 'Front, Back, Left & Right views',
+            showDivider: true,
           ),
-          _buildFeatureItem(
-            theme,
-            Icons.grid_view_rounded,
-            'Custom Layouts',
-            'Grid, PiP, and Tesla dashcam layouts',
-            true,
+          _FeatureItem(
+            icon: Icons.grid_view_rounded,
+            title: 'Tesla-Style Layout',
+            subtitle: 'Matches Tesla dashcam viewer',
+            showDivider: true,
           ),
-          _buildFeatureItem(
-            theme,
-            Icons.high_quality_rounded,
-            'High Quality',
-            'Export in high quality H.264',
-            false,
+          _FeatureItem(
+            icon: Icons.high_quality_rounded,
+            title: 'High Quality Export',
+            subtitle: 'Hardware accelerated H.264',
+            showDivider: true,
+          ),
+          _FeatureItem(
+            icon: Icons.sync_rounded,
+            title: 'Synchronized Playback',
+            subtitle: 'Preview all views in sync',
+            showDivider: false,
           ),
         ],
       ),
     );
   }
-  
-  Widget _buildFeatureItem(
-    ThemeData theme,
-    IconData icon,
-    String title,
-    String subtitle,
-    bool showDivider,
-  ) {
+}
+
+class _HomeAppBar extends StatelessWidget {
+  const _HomeAppBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverAppBar.large(
+      surfaceTintColor: Colors.transparent,
+      actions: [
+        IconButton(
+          onPressed: () => _showHelpDialog(context),
+          icon: const Icon(Icons.help_outline_rounded),
+        ),
+        const SizedBox(width: 8),
+      ],
+    );
+  }
+
+  void _showHelpDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('About TeslaCam Video Merger'),
+        content: const SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'This app helps you merge Tesla dashcam footage from multiple cameras into a single video file.',
+              ),
+              SizedBox(height: 16),
+              Text(
+                'Features:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Text('• Merge up to 4 camera views\n'
+                  '• Tesla-style layout support\n'
+                  '• Hardware accelerated processing\n'
+                  '• Synchronized preview\n'
+                  '• High quality export'),
+              SizedBox(height: 16),
+              Text(
+                'Getting Started:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Text('1. Click "Start New Project"\n'
+                  '2. Choose a layout\n'
+                  '3. Select your Tesla dashcam videos\n'
+                  '4. Preview the merged layout\n'
+                  '5. Process and export'),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FeatureItem extends StatelessWidget {
+  const _FeatureItem({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.showDivider,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final bool showDivider;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -209,115 +222,5 @@ class HomeScreen extends ConsumerWidget {
         ],
       ),
     );
-  }
-  
-  Widget _buildJobCard(BuildContext context, ProcessingJob job, ThemeData theme) {
-    final isActive = job.status == ProcessingStatus.processing || 
-                     job.status == ProcessingStatus.queued;
-    final isCompleted = job.status == ProcessingStatus.completed;
-    final progress = job.progress;
-    
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        onTap: () {
-          if (isActive) {
-            context.go('/processing');
-          } else if (isCompleted && job.outputPath != null) {
-            // Open video details
-          }
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: isActive
-                          ? theme.colorScheme.primary.withAlpha(26)
-                          : Colors.grey.withAlpha(51),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      isActive ? Icons.sync_rounded : Icons.movie_rounded,
-                      color: isActive
-                          ? theme.colorScheme.primary
-                          : Colors.grey.shade600,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Job ${job.id.substring(0, 8)}',
-                          style: theme.textTheme.titleSmall,
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          _formatDate(job.createdAt),
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (isActive)
-                    Icon(
-                      Icons.chevron_right_rounded,
-                      color: Colors.grey.shade400,
-                    ),
-                ],
-              ),
-              if (isActive) ...[
-                const SizedBox(height: 16),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: LinearProgressIndicator(
-                    value: progress / 100,
-                    backgroundColor: theme.colorScheme.primary.withAlpha(26),
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      theme.colorScheme.primary,
-                    ),
-                    minHeight: 4,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '$progress%',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.primary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-              if (isCompleted && job.outputPath != null) ...[
-                const SizedBox(height: 12),
-                Text(
-                  'Output: ${job.outputPath}',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey.shade600,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-  
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
   }
 } 

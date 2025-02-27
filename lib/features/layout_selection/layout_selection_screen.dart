@@ -841,33 +841,50 @@ class _BottomActionBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
+      padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + MediaQuery.of(context).padding.bottom),
+      decoration: const BoxDecoration(
         color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, -2),
+        border: Border(
+          top: BorderSide(
+            color: Color(0xFFE5E5EA), // iOS divider color
+            width: 0.5,
           ),
-        ],
+        ),
       ),
-      child: Row(
-        children: [
-          // Back button
-          OutlinedButton.icon(
-            onPressed: onBack,
-            icon: const Icon(Icons.arrow_back),
-            label: const Text('Back'),
-          ),
-          const Spacer(),
-          // Continue button
-          if (onContinue != null)
-            ElevatedButton(
-              onPressed: onContinue,
-              child: const Text('Continue'),
+      child: SafeArea(
+        child: Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: onBack,
+                child: const Text('Back'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFF007AFF),
+                  side: const BorderSide(color: Color(0xFF007AFF)),
+                  minimumSize: const Size(0, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
             ),
-        ],
+            const SizedBox(width: 16),
+            Expanded(
+              child: FilledButton(
+                onPressed: onContinue,
+                child: const Text('Continue'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFF007AFF),
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(0, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
